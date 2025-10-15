@@ -1,0 +1,26 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=0.8]
+\draw[step=1.0,gray,thin] (-3.24, -4.66) grid (5.52, 4.14);
+\draw[->] (-3.74,0) -- (6.02,0) node[right]{x};
+\draw[->] (0,-5.16) -- (0,4.64) node[right]{y};
+\draw[black, very thick, dotted] (2.70,1.60) -- (3.00,-2.00);
+\draw[black, very thick, dotted] (2.62,3.14) -- (4.52,1.30);
+\draw[black, very thick, dotted] (1.10,-3.46) -- (-2.12,-3.66);
+\draw[black, very thick, dotted] (-2.04,0.80) -- (-2.24,-2.74);
+\draw[black, thick] (-0.52,2.78) -- (1.72,0.72);
+\filldraw (0.00,0.00) circle [radius=0.1] node[above right]{\tiny (0.0, 0.0), 0.0°};
+\filldraw (2.62,3.14) circle [radius=0.1] node[above right]{\tiny (2.6, 3.1), 50.2°};
+\filldraw (4.52,1.30) circle [radius=0.1] node[above right]{\tiny (4.5, 1.3), 16.0°};
+\filldraw (3.00,-2.00) circle [radius=0.1] node[above right]{\tiny (3.0, -2.0), -33.7°};
+\filldraw (-0.52,2.78) circle [radius=0.1] node[above right]{\tiny (-0.5, 2.8), 100.6°};
+\filldraw (1.72,0.72) circle [radius=0.1] node[above right]{\tiny (1.7, 0.7), 22.7°};
+\filldraw (-2.04,0.80) circle [radius=0.1] node[above right]{\tiny (-2.0, 0.8), 158.6°};
+\filldraw (-2.12,-3.66) circle [radius=0.1] node[above right]{\tiny (-2.1, -3.7), -120.1°};
+\filldraw (2.70,1.60) circle [radius=0.1] node[above right]{\tiny (2.7, 1.6), 30.7°};
+\filldraw (-2.24,-2.74) circle [radius=0.1] node[above right]{\tiny (-2.2, -2.7), -129.3°};
+\filldraw (1.10,-3.46) circle [radius=0.1] node[above right]{\tiny (1.1, -3.5), -72.4°};
+\node[above left, tiny] at (0.00, 0.00) {p};
+\end{tikzpicture}
+\end{document}

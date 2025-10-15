@@ -13,31 +13,45 @@ class Segment {
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-        // Example data
-        Point p = new Point(2, 2);
-        List<Segment> segments = List.of(
-            new Segment(new Point(0, 0), new Point(4, 1)),
-            new Segment(new Point(7, 0), new Point(4, 4)),
-            new Segment(new Point(4, 4), new Point(0, -2)),
-            new Segment(new Point(0, 4), new Point(-4, 10))
-        );
+         // Read point and segments from file
+        FileReaderUtil.Data data = FileReaderUtil.readFile("tests/test1.txt");
 
-        List<Segment> visible = List.of(
-            new Segment(new Point(0, 0), new Point(4, 0)),
-            new Segment(new Point(8, 0), new Point(4, 5))
-        );
+        // Special point
+        Point p = data.p;
 
-        writeTikZ(p, segments, visible);
+        // List of segments
+        List<Segment> segments = data.segments;
+
+        // Calculate visible segments
+        List<Segment> visible = VisibleSegmentsAlgorithm.computeVisibleSegments(p, segments);
+
+        // Determine obscured segments
+        List<Segment> obscured = new ArrayList<>();
+        for (Segment s : segments) {
+            boolean isVisible = false;
+            for (Segment v : visible) {
+                if ((s.a.x == v.a.x && s.a.y == v.a.y && s.b.x == v.b.x && s.b.y == v.b.y) ||
+                    (s.a.x == v.b.x && s.a.y == v.b.y && s.b.x == v.a.x && s.b.y == v.a.y)) {
+                    isVisible = true;
+                    break;
+                }
+            }
+            if (!isVisible) {
+                obscured.add(s);
+            }
+        }
+
+        writeTikZ(p, obscured, visible);
         compilePDF("output.tex");
     }
 
-    static void writeTikZ(Point p, List<Segment> segments, List<Segment> visible) throws IOException {
+    static void writeTikZ(Point p, List<Segment> obscured, List<Segment> visible) throws IOException {
 
         // Compute bounding box and collect points
         double minX = p.x, minY = p.y, maxX = p.x, maxY = p.y;
         Set<Point> points = new HashSet<>();
         points.add(p); // include the special point
-        for (Segment s : segments) {
+        for (Segment s : obscured) {
             minX = Math.min(minX, Math.min(s.a.x, s.b.x));
             minY = Math.min(minY, Math.min(s.a.y, s.b.y));
             maxX = Math.max(maxX, Math.max(s.a.x, s.b.x));
@@ -72,8 +86,8 @@ public class Main {
             out.printf("\\draw[->] (%.2f,0) -- (%.2f,0) node[right]{x};\n", minX-0.5, maxX+0.5);
             out.printf("\\draw[->] (0,%.2f) -- (0,%.2f) node[right]{y};\n", minY-0.5, maxY+0.5);
 
-            // Draw all segments (gray thin)
-            for (Segment s : segments) {
+            // Draw all obscured (gray thin)
+            for (Segment s : obscured) {
                 out.printf("\\draw[black, very thick, dotted] (%.2f,%.2f) -- (%.2f,%.2f);\n", s.a.x, s.a.y, s.b.x, s.b.y);
             }
 
@@ -84,8 +98,13 @@ public class Main {
 
             // Draw points with coordinates
             for (Point pt : points) {
-                out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f)};\n",
-                        pt.x, pt.y, pt.x, pt.y);
+                // calculate angle from p to pt
+                double angle = Math.atan2(pt.y - p.y, pt.x - p.x);
+                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f)};\n",
+                //         pt.x, pt.y, pt.x, pt.y);
+                // also print angle in degrees together with coordinates
+                out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.1f°};\n",
+                        pt.x, pt.y, pt.x, pt.y, Math.toDegrees(angle));
             }
 
 
@@ -117,6 +136,9 @@ public class Main {
             new File("output.log").delete();
         } else {
             System.out.println("Error compiling PDF. Check LaTeX output.");
+            // Delete .aux and .log files
+            new File("output.aux").delete();
+            new File("output.log").delete();
         }
     }
 }
