@@ -14,7 +14,7 @@ class Segment {
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
          // Read point and segments from file
-        FileReaderUtil.Data data = FileReaderUtil.readFile("tests/test1.txt");
+        FileReaderUtil.Data data = FileReaderUtil.readFile("tests/test4.txt");
 
         // Special point
         Point p = data.p;
@@ -98,13 +98,20 @@ public class Main {
 
             // Draw points with coordinates
             for (Point pt : points) {
-                // calculate angle from p to pt
-                double angle = Math.atan2(pt.y - p.y, pt.x - p.x);
-                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f)};\n",
-                //         pt.x, pt.y, pt.x, pt.y);
-                // also print angle in degrees together with coordinates
-                out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.1f°};\n",
-                        pt.x, pt.y, pt.x, pt.y, Math.toDegrees(angle));
+                // // Calculate angle from p to pt
+                // double angle = Math.toDegrees(Math.atan2(pt.y - p.y, pt.x - p.x));
+                // if (angle < 0) {
+                //     angle += 360; // Ensure the angle is in the range [0, 360)
+                // }
+                // // Calculate distance from p to pt
+                // double distance = Math.hypot(pt.x - p.x, pt.y - p.y);
+                out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f)};\n",
+                        pt.x, pt.y, pt.x, pt.y);
+                // // also print angle in degrees together with coordinates
+                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.1f°};\n",
+                //         pt.x, pt.y, pt.x, pt.y, Math.toDegrees(angle));
+                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.2f°, %.1f};\n",
+                //         pt.x, pt.y, pt.x, pt.y, angle, distance);
             }
 
 
@@ -139,6 +146,7 @@ public class Main {
             // Delete .aux and .log files
             new File("output.aux").delete();
             new File("output.log").delete();
+
         }
     }
 }
