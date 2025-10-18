@@ -1,20 +1,29 @@
 import java.io.*;
 import java.util.*;
 
-class Point {
-    double x, y;
-    Point(double x, double y) { this.x = x; this.y = y; }
-}
-
-class Segment {
-    Point a, b;
-    Segment(Point a, Point b) { this.a = a; this.b = b; }
-}
-
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        String[] testFiles = {
+            "tests/test1.txt",
+            "tests/test2.txt",
+            "tests/test3.txt",
+            "tests/test4.txt",
+            "tests/test5.txt",
+            "tests/test6.txt",
+            "tests/test7.txt",
+            "tests/test8.txt"
+        };
+        for (String testFile : testFiles) {
+            System.out.println("Processing " + testFile);
+            processTestFile(testFile);
+            System.out.println();
+        }
+    }
+
+    static void processTestFile(String filename) throws IOException, InterruptedException {
+
          // Read point and segments from file
-        FileReaderUtil.Data data = FileReaderUtil.readFile("tests/test4.txt");
+        FileReaderUtil.Data data = FileReaderUtil.readFile(filename);
 
         // Special point
         Point p = data.p;
@@ -41,11 +50,12 @@ public class Main {
             }
         }
 
-        writeTikZ(p, obscured, visible);
-        compilePDF("output.tex");
+        String outputTexFile = "output/out-" + filename.substring(filename.lastIndexOf("test"), filename.lastIndexOf(".txt")) + ".tex";
+        writeTikZ(p, obscured, visible, outputTexFile);
+        compilePDF(outputTexFile);
     }
 
-    static void writeTikZ(Point p, List<Segment> obscured, List<Segment> visible) throws IOException {
+    static void writeTikZ(Point p, List<Segment> obscured, List<Segment> visible, String filename) throws IOException {
 
         // Compute bounding box and collect points
         double minX = p.x, minY = p.y, maxX = p.x, maxY = p.y;
@@ -73,7 +83,7 @@ public class Main {
         minX -= margin; minY -= margin;
         maxX += margin; maxY += margin;
 
-        try (PrintWriter out = new PrintWriter("output.tex")) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(filename))) {
             out.println("\\documentclass{standalone}");
             out.println("\\usepackage{tikz}");
             out.println("\\begin{document}");
@@ -98,22 +108,9 @@ public class Main {
 
             // Draw points with coordinates
             for (Point pt : points) {
-                // // Calculate angle from p to pt
-                // double angle = Math.toDegrees(Math.atan2(pt.y - p.y, pt.x - p.x));
-                // if (angle < 0) {
-                //     angle += 360; // Ensure the angle is in the range [0, 360)
-                // }
-                // // Calculate distance from p to pt
-                // double distance = Math.hypot(pt.x - p.x, pt.y - p.y);
                 out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f)};\n",
                         pt.x, pt.y, pt.x, pt.y);
-                // // also print angle in degrees together with coordinates
-                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.1f°};\n",
-                //         pt.x, pt.y, pt.x, pt.y, Math.toDegrees(angle));
-                // out.printf("\\filldraw (%.2f,%.2f) circle [radius=0.1] node[above right]{\\tiny (%.1f, %.1f), %.2f°, %.1f};\n",
-                //         pt.x, pt.y, pt.x, pt.y, angle, distance);
             }
-
 
             // Highlight special point p by adding extra "p" above left
             out.printf("\\node[above left, tiny] at (%.2f, %.2f) {p};\n", p.x, p.y);
@@ -123,12 +120,11 @@ public class Main {
         }
     }
 
-
-
     static void compilePDF(String texFile) throws IOException, InterruptedException {
         System.out.println("Compiling " + texFile + " to PDF...");
         ProcessBuilder pb = new ProcessBuilder(
             "pdflatex", 
+            "-output-directory=output",  // specify output directory
             "-interaction=batchmode",  // suppress output log
             texFile
         );
@@ -136,17 +132,16 @@ public class Main {
         Process p = pb.start();
         int exitCode = p.waitFor();
         if (exitCode == 0) {
-            System.out.println("PDF generated successfully: output.pdf");
+            System.out.println("PDF generated successfully: output/" + texFile.replace(".tex", ".pdf"));
 
             // Delete .aux and .log files
-            new File("output.aux").delete();
-            new File("output.log").delete();
+            new File(texFile.replace(".tex", ".aux")).delete();
+            new File(texFile.replace(".tex", ".log")).delete();
         } else {
-            System.out.println("Error compiling PDF. Check LaTeX output.");
-            // Delete .aux and .log files
-            new File("output.aux").delete();
-            new File("output.log").delete();
-
+            System.out.println("Error during PDF compilation.");
+            // Delete
+            new File(texFile.replace(".tex", ".aux")).delete();
+            new File(texFile.replace(".tex", ".log")).delete();
         }
     }
 }

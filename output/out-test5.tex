@@ -1,0 +1,38 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=0.8]
+\draw[step=1.0,gray,thin] (-1.00, -9.00) grid (6.00, 9.10);
+\draw[->] (-1.50,0) -- (6.50,0) node[right]{x};
+\draw[->] (0,-9.50) -- (0,9.60) node[right]{y};
+\draw[black, very thick, dotted] (2.00,1.00) -- (2.00,-1.00);
+\draw[black, very thick, dotted] (3.00,0.50) -- (3.00,-0.50);
+\draw[black, very thick, dotted] (3.00,1.00) -- (3.00,2.00);
+\draw[black, very thick, dotted] (3.00,-1.00) -- (3.00,-2.00);
+\draw[black, very thick, dotted] (4.00,0.80) -- (5.00,1.50);
+\draw[black, very thick, dotted] (4.00,-1.00) -- (4.00,-5.00);
+\draw[black, very thick, dotted] (2.00,-5.00) -- (2.00,-8.00);
+\draw[black, thick] (1.00,4.00) -- (1.00,-4.00);
+\draw[black, thick] (2.00,4.00) -- (2.00,8.10);
+\filldraw (2.00,-1.00) circle [radius=0.1] node[above right]{\tiny (2.0, -1.0)};
+\filldraw (5.00,1.50) circle [radius=0.1] node[above right]{\tiny (5.0, 1.5)};
+\filldraw (2.00,8.10) circle [radius=0.1] node[above right]{\tiny (2.0, 8.1)};
+\filldraw (2.00,4.00) circle [radius=0.1] node[above right]{\tiny (2.0, 4.0)};
+\filldraw (2.00,-8.00) circle [radius=0.1] node[above right]{\tiny (2.0, -8.0)};
+\filldraw (3.00,-0.50) circle [radius=0.1] node[above right]{\tiny (3.0, -0.5)};
+\filldraw (3.00,0.50) circle [radius=0.1] node[above right]{\tiny (3.0, 0.5)};
+\filldraw (4.00,-5.00) circle [radius=0.1] node[above right]{\tiny (4.0, -5.0)};
+\filldraw (2.00,-5.00) circle [radius=0.1] node[above right]{\tiny (2.0, -5.0)};
+\filldraw (3.00,1.00) circle [radius=0.1] node[above right]{\tiny (3.0, 1.0)};
+\filldraw (2.00,1.00) circle [radius=0.1] node[above right]{\tiny (2.0, 1.0)};
+\filldraw (0.00,0.00) circle [radius=0.1] node[above right]{\tiny (0.0, 0.0)};
+\filldraw (3.00,-2.00) circle [radius=0.1] node[above right]{\tiny (3.0, -2.0)};
+\filldraw (1.00,4.00) circle [radius=0.1] node[above right]{\tiny (1.0, 4.0)};
+\filldraw (3.00,2.00) circle [radius=0.1] node[above right]{\tiny (3.0, 2.0)};
+\filldraw (1.00,-4.00) circle [radius=0.1] node[above right]{\tiny (1.0, -4.0)};
+\filldraw (3.00,-1.00) circle [radius=0.1] node[above right]{\tiny (3.0, -1.0)};
+\filldraw (4.00,-1.00) circle [radius=0.1] node[above right]{\tiny (4.0, -1.0)};
+\filldraw (4.00,0.80) circle [radius=0.1] node[above right]{\tiny (4.0, 0.8)};
+\node[above left, tiny] at (0.00, 0.00) {p};
+\end{tikzpicture}
+\end{document}

@@ -1,7 +1,4 @@
-// import java.io.*;
-// import org.w3c.dom.events.Event;
 import java.util.*;
-
 
 class Point {
     double x, y;
@@ -31,14 +28,22 @@ class Event implements Comparable<Event> {
         int cmp = Double.compare(this.angle, other.angle);
         if (cmp != 0) return cmp;
 
-        // Same angle → start events come before end events
+        // If same angle:
         if (this.start != other.start) {
+            // Start events first
             return this.start ? 1 : -1;
         }
 
-        // Optional: tie-break by distance (closer first)
-        return Double.compare(this.distance, other.distance);
+        // Both start or both end:
+        // For start events → closer first
+        // For end events → farther first
+        if (this.start) {
+            return Double.compare(this.distance, other.distance); // closer first
+        } else {
+            return Double.compare(other.distance, this.distance); // farther first
+        }
     }
+
 }
 
 public class VisibleSegmentsAlgorithm {
@@ -57,26 +62,23 @@ public class VisibleSegmentsAlgorithm {
             double distanceA = Math.hypot(s.a.x - p.x, s.a.y - p.y);
             double distanceB = Math.hypot(s.b.x - p.x, s.b.y - p.y);
 
-            // Case angle does not cross the 0 degree line
-            if (Math.abs(angleA - angleB) <= 180) {
-                if (angleA < angleB) {
+            if (angleA < angleB) {
+                if (angleB - angleA <= 180) {
+                    // normal interval
                     eventQueue.add(new Event(angleA, distanceA, s, true));
                     eventQueue.add(new Event(angleB, distanceB, s, false));
                 } else {
                     eventQueue.add(new Event(angleB, distanceB, s, true));
                     eventQueue.add(new Event(angleA, distanceA, s, false));
                 }
-            } else { // Case angle crosses the 0 degree line
-                if (angleA < angleB) {
-                    eventQueue.add(new Event(angleB, distanceB, s, false));        // end at high angle
-                    eventQueue.add(new Event(0.0, distanceA, s, true));      // start again at 0
-                    eventQueue.add(new Event(angleA, distanceA, s, true));         // original start
-                    eventQueue.add(new Event(360.0, distanceB, s, false));   // end of circle
-                } else {
-                    eventQueue.add(new Event(angleA, distanceA, s, false));
-                    eventQueue.add(new Event(0.0, distanceB, s, true));
+            } else {
+                if (angleA - angleB <= 180) {
+                    // normal interval
                     eventQueue.add(new Event(angleB, distanceB, s, true));
-                    eventQueue.add(new Event(360.0, distanceA, s, false));
+                    eventQueue.add(new Event(angleA, distanceA, s, false));
+                } else {
+                    eventQueue.add(new Event(angleA, distanceA, s, true));
+                    eventQueue.add(new Event(angleB, distanceB, s, false));
                 }
             }
         }
@@ -88,16 +90,45 @@ public class VisibleSegmentsAlgorithm {
         TreeSet<Segment> activeSegments = new TreeSet<>(new Comparator<Segment>() {
             @Override
             public int compare(Segment s1, Segment s2) {
-                // Compare segments based on their distance to point p
+                // Check if segment cut
+                boolean s1Crosses = crossesZeroLineRight(p, s1);
+                boolean s2Crosses = crossesZeroLineRight(p, s2);
+
                 double dist1 = Math.min(Math.hypot(s1.a.x - p.x, s1.a.y - p.y),
                                         Math.hypot(s1.b.x - p.x, s1.b.y - p.y));
                 double dist2 = Math.min(Math.hypot(s2.a.x - p.x, s2.a.y - p.y),
                                         Math.hypot(s2.b.x - p.x, s2.b.y - p.y));
+
+                if (s1Crosses) {
+                    System.out.println("Seg is crossing");
+                    System.out.println("A: (" + s1.a.x + ", " + s1.a.y + "), B: (" + s1.b.x + ", " + s1.b.y + ")");
+                    dist1 = Math.min(dist1, Math.abs(crossesZeroLineRightX(p, s1) - p.x));
+                    // Print distance
+                    System.out.println("Shortest distance to p on seg: " + dist1);
+                }
+
+                if (s2Crosses) {
+                    System.out.println("Seg is crossing");
+                    System.out.println("A: (" + s2.a.x + ", " + s2.a.y + "), B: (" + s2.b.x + ", " + s2.b.y + ")");
+                    dist2 = Math.min(dist2, Math.abs(crossesZeroLineRightX(p, s2) - p.x));
+                }
+
+                // Compare segments based on their distance to point p
                 return Double.compare(dist1, dist2);
             }
         });
 
         List<Segment> visibleSegments = new ArrayList<>();
+
+        // start by adding all segments that cut through the initial ray at angle 0°
+        for (Event e : eventQueue) {
+            Segment s = e.seg;
+
+            if (crossesZeroLineRight(p, s)) {
+                activeSegments.add(s);
+            }
+        }
+
         for (Event e : eventQueue) {
             if (e.start) {
                 // Add segment to active list
@@ -120,4 +151,44 @@ public class VisibleSegmentsAlgorithm {
         return visibleSegments;
 
     }
+
+    public static boolean crossesZeroLineRight(Point p, Segment s) {
+        // Check if segment crosses horizontal line y = p.y
+        if ((s.a.y - p.y) * (s.b.y - p.y) <= 0) {
+            double intersectX;
+            if (s.a.y == s.b.y) {
+                // Horizontal segment, check both endpoints
+                intersectX = Math.max(s.a.x, s.b.x);
+            } else {
+                // Linear interpolation to find x where y = p.y
+                intersectX = s.a.x + (s.b.x - s.a.x) * ((p.y - s.a.y) / (s.b.y - s.a.y));
+            }
+
+            // Return true if intersection is right of p
+            return intersectX > p.x;
+        }
+
+        // Does not cross horizontal line at p.y
+        return false;
+    }
+
+    public static double crossesZeroLineRightX(Point p, Segment s) {
+        // Check if segment crosses horizontal line y = p.y
+        if ((s.a.y - p.y) * (s.b.y - p.y) <= 0) {
+            double intersectX;
+            if (s.a.y == s.b.y) {
+                // Horizontal segment, check both endpoints
+                intersectX = Math.max(s.a.x, s.b.x);
+            } else {
+                // Linear interpolation to find x where y = p.y
+                intersectX = s.a.x + (s.b.x - s.a.x) * ((p.y - s.a.y) / (s.b.y - s.a.y));
+            }
+
+            return intersectX;
+        }
+
+        // Does not cross horizontal line at p.y
+        return 0.0;
+    }
+
 }

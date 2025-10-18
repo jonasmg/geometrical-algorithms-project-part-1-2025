@@ -1,0 +1,20 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=0.8]
+\draw[step=1.0,gray,thin] (-1.40, -1.84) grid (6.78, 5.60);
+\draw[->] (-1.90,0) -- (7.28,0) node[right]{x};
+\draw[->] (0,-2.34) -- (0,6.10) node[right]{y};
+\draw[black, thick] (3.36,2.56) -- (3.16,-0.84);
+\draw[black, thick] (0.42,4.60) -- (5.78,0.28);
+\draw[black, thick] (2.58,3.12) -- (-0.40,3.18);
+\filldraw (-0.40,3.18) circle [radius=0.1] node[above right]{\tiny (-0.4, 3.2)};
+\filldraw (0.42,4.60) circle [radius=0.1] node[above right]{\tiny (0.4, 4.6)};
+\filldraw (5.78,0.28) circle [radius=0.1] node[above right]{\tiny (5.8, 0.3)};
+\filldraw (3.16,-0.84) circle [radius=0.1] node[above right]{\tiny (3.2, -0.8)};
+\filldraw (0.00,0.00) circle [radius=0.1] node[above right]{\tiny (0.0, 0.0)};
+\filldraw (2.58,3.12) circle [radius=0.1] node[above right]{\tiny (2.6, 3.1)};
+\filldraw (3.36,2.56) circle [radius=0.1] node[above right]{\tiny (3.4, 2.6)};
+\node[above left, tiny] at (0.00, 0.00) {p};
+\end{tikzpicture}
+\end{document}
